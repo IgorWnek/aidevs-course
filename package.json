@@ -4,11 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "sst dev",
-    "build": "sst build",
-    "deploy": "sst deploy",
-    "remove": "sst remove",
-    "console": "sst console",
+    "dev": "AWS_PROFILE=aidevs-course sst dev",
+    "build": "AWS_PROFILE=aidevs-course sst build",
+    "deploy": "AWS_PROFILE=aidevs-course sst deploy --stage prod",
+    "remove": "AWS_PROFILE=aidevs-course sst remove",
+    "console": "AWS_PROFILE=aidevs-course sst console",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
@@ -21,5 +21,10 @@
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "dotenv": "^16.1.3",
+    "node-fetch": "^3.3.1",
+    "openai": "^3.2.1"
+  }
 }
