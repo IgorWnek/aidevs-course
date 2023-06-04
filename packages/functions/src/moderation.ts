@@ -13,6 +13,7 @@ export const handler = ApiHandler(async (event: APIGatewayProxyEventV2) => {
   const taskName = 'moderation';
   const aiDevsTaskTokenEndpointUrl = `${aiDevsTasksUrl}/token/${taskName}`;
 
+
   const options: RequestInit = {
     method: 'POST',
     headers: {
@@ -86,10 +87,10 @@ console.log(prompt);
   })
 console.log(completionResponse.data.choices[0].message?.content);
   const chatResponseContent = completionResponse.data.choices[0].message?.content;
-  let moderationPhrases = [];
+  let moderationPhrases = [] as number[];
 
   if (chatResponseContent) {
-    moderationPhrases = JSON.parse(chatResponseContent);
+    moderationPhrases = JSON.parse(chatResponseContent) as number[];
   }
 
   // Verify answer
