@@ -1,57 +1,53 @@
 import { ApiHandler } from "sst/node/api";
 import { Time } from "@aidevs-course/core/time";
 import { APIGatewayProxyEventV2 } from "aws-lambda";
-import 'dotenv/config';
+import "dotenv/config";
 import fetch, { RequestInit } from "node-fetch";
 import { Configuration, OpenAIApi } from "openai";
 import { ChatCompletionRequestMessage } from "openai/api";
 
 export const handler = ApiHandler(async (event: APIGatewayProxyEventV2) => {
-
   const aiDevsApiKey = process.env.AI_DEVS_API_KEY;
-  const aiDevsTasksUrl = 'https://zadania.aidevs.pl';
-  const taskName = 'moderation';
+  const aiDevsTasksUrl = "https://zadania.aidevs.pl";
+  const taskName = "moderation";
   const aiDevsTaskTokenEndpointUrl = `${aiDevsTasksUrl}/token/${taskName}`;
 
-
   const options: RequestInit = {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      'apikey': aiDevsApiKey,
+      apikey: aiDevsApiKey,
     }),
   };
 
   type TaskToken = {
-    code: number,
-    msg: string,
-    token: string
+    code: number;
+    msg: string;
+    token: string;
   };
 
   const taskTokenResponse = await fetch(aiDevsTaskTokenEndpointUrl, options);
-  const taskToken = await taskTokenResponse.json() as TaskToken;
-
-  console.log(taskToken.token);
+  const taskToken = (await taskTokenResponse.json()) as TaskToken;
 
   const aiDevsTaskEndpointUrl = `${aiDevsTasksUrl}/task/${taskToken.token}`;
   const taskEndpointOptions: RequestInit = {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
   };
 
   type ModerationTask = {
-    code: number,
-    msg: string,
-    input: [string, string, string, string],
+    code: number;
+    msg: string;
+    input: [string, string, string, string];
   };
 
   const taskResponse = await fetch(aiDevsTaskEndpointUrl, taskEndpointOptions);
-  const moderationTask = await taskResponse.json() as ModerationTask;
-console.log(moderationTask);
+  const moderationTask = (await taskResponse.json()) as ModerationTask;
+
   // Business Logic
   const openaiConfiguration = new Configuration({
     organization: process.env.OPENAI_ORGANIZATION_ID,
@@ -76,17 +72,18 @@ Przykładowa odpowiedź:
 ### Zadanie
 ${JSON.stringify(moderationTask.input)}
   `;
-console.log(prompt);
+
   const message: ChatCompletionRequestMessage = {
-    role: 'user',
-    content: prompt
-  }
+    role: "user",
+    content: prompt,
+  };
   const completionResponse = await openai.createChatCompletion({
     messages: [message],
-    model: 'gpt-4',
-  })
-console.log(completionResponse.data.choices[0].message?.content);
-  const chatResponseContent = completionResponse.data.choices[0].message?.content;
+    model: "gpt-4",
+  });
+
+  const chatResponseContent =
+    completionResponse.data.choices[0].message?.content;
   let moderationPhrases = [] as number[];
 
   if (chatResponseContent) {
@@ -96,23 +93,21 @@ console.log(completionResponse.data.choices[0].message?.content);
   // Verify answer
   const answerEndpointUrl = `${aiDevsTasksUrl}/answer/${taskToken.token}`;
   const answerRequestOptions: RequestInit = {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      answer: moderationPhrases
+      answer: moderationPhrases,
     }),
-  }
-
-  console.log(answerRequestOptions);
+  };
 
   const answerResponse = await fetch(answerEndpointUrl, answerRequestOptions);
-  console.log(answerResponse);
+
   if (answerResponse.ok) {
     return {
-      body: `Answer correct! 🎉🎉🎉`
-    }
+      body: `Answer correct! 🎉🎉🎉`,
+    };
   }
 
   return {
