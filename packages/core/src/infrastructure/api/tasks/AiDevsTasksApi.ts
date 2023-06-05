@@ -11,6 +11,11 @@ interface AiDevsTaskTokenResponse {
   msg: string;
   token: string;
 }
+interface TaskResponse<TaskResponseData> {
+  code: number;
+  msg: string;
+  input: TaskResponseData;
+}
 
 export class AiDevsTasksApi implements TasksApi {
   private tasksUrl = 'https://zadania.aidevs.pl';
@@ -50,14 +55,9 @@ export class AiDevsTasksApi implements TasksApi {
         'Content-Type': 'application/json',
       },
     };
-    interface TaskResponse {
-      code: number;
-      msg: string;
-      input: TaskData;
-    }
 
     const taskResponse = await fetch(taskEndpointUrl, requestOptions);
-    const task = (await taskResponse.json()) as TaskResponse;
+    const task = (await taskResponse.json()) as TaskResponse<TaskData>;
 
     return task.input;
   }
