@@ -1,6 +1,6 @@
-interface TaskToken {
+export interface TaskToken {
   value: string;
 }
-interface TasksApi {
+export interface TasksApi {
   fetchTaskToken(taskName: string): Promise<TaskToken>;
 }

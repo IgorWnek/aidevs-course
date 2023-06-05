@@ -2,6 +2,7 @@ import fetch, { RequestInit } from 'node-fetch';
 import { Configuration, OpenAIApi } from 'openai';
 import { ChatCompletionRequestMessage } from 'openai/api';
 import { OpenAiConfig } from '../../../../config/openAi/OpenAiConfig';
+import { TasksApi } from "../../api/tasks/TasksApi";
 
 export interface SolveModerationTaskDependencies {
   tasksApi: TasksApi;
