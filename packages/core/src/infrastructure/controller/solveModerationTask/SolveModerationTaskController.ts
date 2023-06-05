@@ -1,11 +1,10 @@
-import { AiDevsConfig } from '../../../../config/aiDevs/AiDevsConfig';
 import fetch, { RequestInit } from 'node-fetch';
 import { Configuration, OpenAIApi } from 'openai';
 import { ChatCompletionRequestMessage } from 'openai/api';
 import { OpenAiConfig } from '../../../../config/openAi/OpenAiConfig';
 
 export interface SolveModerationTaskDependencies {
-  aiDevsConfig: AiDevsConfig;
+  tasksApi: TasksApi;
   openAiConfig: OpenAiConfig;
 }
 
@@ -19,32 +18,14 @@ export class SolveModerationTaskController {
   public constructor(private dependencies: SolveModerationTaskDependencies) {}
 
   public async execute(): Promise<SolveModerationTaskResponse> {
-    const { aiDevsConfig, openAiConfig } = this.dependencies;
+    const { tasksApi, openAiConfig } = this.dependencies;
 
     const aiDevsTasksUrl = 'https://zadania.aidevs.pl';
     const taskName = 'moderation';
-    const aiDevsTaskTokenEndpointUrl = `${aiDevsTasksUrl}/token/${taskName}`;
 
-    const options: RequestInit = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        apikey: aiDevsConfig.apiKey,
-      }),
-    };
+    const taskToken = await tasksApi.fetchTaskToken(taskName);
 
-    type TaskToken = {
-      code: number;
-      msg: string;
-      token: string;
-    };
-
-    const taskTokenResponse = await fetch(aiDevsTaskTokenEndpointUrl, options);
-    const taskToken = (await taskTokenResponse.json()) as TaskToken;
-
-    const aiDevsTaskEndpointUrl = `${aiDevsTasksUrl}/task/${taskToken.token}`;
+    const aiDevsTaskEndpointUrl = `${aiDevsTasksUrl}/task/${taskToken.value}`;
     const taskEndpointOptions: RequestInit = {
       method: 'GET',
       headers: {
@@ -107,7 +88,7 @@ ${JSON.stringify(moderationTask.input)}
     }
 
     // Verify answer
-    const answerEndpointUrl = `${aiDevsTasksUrl}/answer/${taskToken.token}`;
+    const answerEndpointUrl = `${aiDevsTasksUrl}/answer/${taskToken.value}`;
     const answerRequestOptions: RequestInit = {
       method: 'POST',
       headers: {

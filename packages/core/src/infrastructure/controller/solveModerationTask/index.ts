@@ -1,9 +1,9 @@
 import { SolveModerationTaskController } from './SolveModerationTaskController';
-import { aiDevsConfig } from '../../../../config/aiDevs';
 import { openAiConfig } from '../../../../config/openAi';
+import { aiDevsTasksApi } from '../../api/tasks';
 
 const solveModerationTaskController = new SolveModerationTaskController({
-  aiDevsConfig,
+  tasksApi: aiDevsTasksApi,
   openAiConfig,
 });
 
