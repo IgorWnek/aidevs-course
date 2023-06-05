@@ -1,5 +1,6 @@
 import { AiDevsConfig } from '../../../../config/aiDevs/AiDevsConfig';
 import fetch, { RequestInit } from 'node-fetch';
+import { TasksApi, TaskToken } from './TasksApi';
 
 export interface AiDevsTasksApiDependencies {
   aiDevsConfig: AiDevsConfig;
@@ -38,5 +39,26 @@ export class AiDevsTasksApi implements TasksApi {
     return {
       value: taskToken.token,
     };
+  }
+
+  async getTaskData<TaskData>(taskToken: TaskToken): Promise<TaskData> {
+    const taskPath = '/task';
+    const taskEndpointUrl = `${this.tasksUrl}${taskPath}/${taskToken.value}`;
+    const requestOptions: RequestInit = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+    interface TaskResponse {
+      code: number;
+      msg: string;
+      input: TaskData;
+    }
+
+    const taskResponse = await fetch(taskEndpointUrl, requestOptions);
+    const task = (await taskResponse.json()) as TaskResponse;
+
+    return task.input;
   }
 }

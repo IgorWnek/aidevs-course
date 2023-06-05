@@ -2,7 +2,7 @@ import fetch, { RequestInit } from 'node-fetch';
 import { Configuration, OpenAIApi } from 'openai';
 import { ChatCompletionRequestMessage } from 'openai/api';
 import { OpenAiConfig } from '../../../../config/openAi/OpenAiConfig';
-import { TasksApi } from "../../api/tasks/TasksApi";
+import { TasksApi } from '../../api/tasks/TasksApi';
 
 export interface SolveModerationTaskDependencies {
   tasksApi: TasksApi;
@@ -26,25 +26,10 @@ export class SolveModerationTaskController {
 
     const taskToken = await tasksApi.fetchTaskToken(taskName);
 
-    const aiDevsTaskEndpointUrl = `${aiDevsTasksUrl}/task/${taskToken.value}`;
-    const taskEndpointOptions: RequestInit = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-
-    type ModerationTask = {
-      code: number;
-      msg: string;
-      input: [string, string, string, string];
-    };
-
-    const taskResponse = await fetch(
-      aiDevsTaskEndpointUrl,
-      taskEndpointOptions
+    type ModerationTaskData = [string, string, string, string];
+    const moderationTaskData = await tasksApi.getTaskData<ModerationTaskData>(
+      taskToken
     );
-    const moderationTask = (await taskResponse.json()) as ModerationTask;
 
     // Business Logic
     const openaiConfiguration = new Configuration({
@@ -68,7 +53,7 @@ Przykładowa odpowiedź:
 [0,0,1,0]
 
 ### Zadanie
-${JSON.stringify(moderationTask.input)}
+${JSON.stringify(moderationTaskData)}
   `;
 
     const message: ChatCompletionRequestMessage = {

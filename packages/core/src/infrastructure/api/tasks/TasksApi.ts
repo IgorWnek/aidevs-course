@@ -3,4 +3,5 @@ export interface TaskToken {
 }
 export interface TasksApi {
   fetchTaskToken(taskName: string): Promise<TaskToken>;
+  getTaskData<TaskData>(taskToken: TaskToken): Promise<TaskData>;
 }
