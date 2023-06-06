@@ -1,6 +1,6 @@
 import { AiDevsConfig } from '../../../../config/aiDevs/AiDevsConfig';
 import fetch, { RequestInit } from 'node-fetch';
-import { TasksApi, TaskToken } from './TasksApi';
+import { TaskAnswer, TasksApi, TaskToken } from './TasksApi';
 
 export interface AiDevsTasksApiDependencies {
   aiDevsConfig: AiDevsConfig;
@@ -60,5 +60,34 @@ export class AiDevsTasksApi implements TasksApi {
     const task = (await taskResponse.json()) as TaskResponse<TaskData>;
 
     return task.input;
+  }
+
+  async sendAnswer<AnswerData>(
+    answerData: AnswerData,
+    taskToken: TaskToken
+  ): Promise<TaskAnswer> {
+    const answerPath = '/answer';
+    const answerEndpointUrl = `${this.tasksUrl}${answerPath}/${taskToken.value}`;
+    const requestOptions: RequestInit = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        answer: answerData,
+      }),
+    };
+
+    const answerResponse = await fetch(answerEndpointUrl, requestOptions);
+
+    const answer: TaskAnswer = {
+      isCorrect: false,
+    };
+
+    if (answerResponse.ok) {
+      answer.isCorrect = true;
+    }
+
+    return answer;
   }
 }

@@ -1,8 +1,8 @@
-import fetch, { RequestInit } from 'node-fetch';
 import { Configuration, OpenAIApi } from 'openai';
 import { ChatCompletionRequestMessage } from 'openai/api';
 import { OpenAiConfig } from '../../../../config/openAi/OpenAiConfig';
 import { TasksApi } from '../../api/tasks/TasksApi';
+import { aiDevsTasksApi } from '../../api/tasks';
 
 export interface SolveModerationTaskDependencies {
   tasksApi: TasksApi;
@@ -20,8 +20,6 @@ export class SolveModerationTaskController {
 
   public async execute(): Promise<SolveModerationTaskResponse> {
     const { tasksApi, openAiConfig } = this.dependencies;
-
-    const aiDevsTasksUrl = 'https://zadania.aidevs.pl';
     const taskName = 'moderation';
 
     const taskToken = await tasksApi.fetchTaskToken(taskName);
@@ -73,21 +71,12 @@ ${JSON.stringify(moderationTaskData)}
       moderationPhrases = JSON.parse(chatResponseContent) as number[];
     }
 
-    // Verify answer
-    const answerEndpointUrl = `${aiDevsTasksUrl}/answer/${taskToken.value}`;
-    const answerRequestOptions: RequestInit = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        answer: moderationPhrases,
-      }),
-    };
+    const taskAnswer = await aiDevsTasksApi.sendAnswer(
+      moderationPhrases,
+      taskToken
+    );
 
-    const answerResponse = await fetch(answerEndpointUrl, answerRequestOptions);
-
-    if (answerResponse.ok) {
+    if (taskAnswer.isCorrect) {
       return {
         content: `Answer correct! 🎉🎉🎉`,
       };
