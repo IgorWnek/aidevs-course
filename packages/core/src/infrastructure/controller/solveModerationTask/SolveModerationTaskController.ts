@@ -1,10 +1,12 @@
 import { TasksApi } from '../../api/tasks/TasksApi';
 import { aiDevsTasksApi } from '../../api/tasks';
 import { AiChatApi, Prompt } from '../../api/aiChat/AiChatApi';
+import { Logger } from '../../log/Logger';
 
 export interface SolveModerationTaskDependencies {
   tasksApi: TasksApi;
   aiChatApi: AiChatApi;
+  logger: Logger;
 }
 
 export interface SolveModerationTaskResponse {
@@ -17,15 +19,19 @@ export class SolveModerationTaskController {
   public constructor(private dependencies: SolveModerationTaskDependencies) {}
 
   public async execute(): Promise<SolveModerationTaskResponse> {
-    const { tasksApi, aiChatApi } = this.dependencies;
+    const { tasksApi, aiChatApi, logger } = this.dependencies;
+
     const taskName = 'moderation';
+    logger.info(`Started ${taskName} task.`);
 
     const taskToken = await tasksApi.fetchTaskToken(taskName);
+    logger.info('Gathered task token.');
 
     type ModerationTaskData = [string, string, string, string];
     const moderationTaskData = await tasksApi.getTaskData<ModerationTaskData>(
       taskToken
     );
+    logger.info(`Moderation task data:\n${moderationTaskData.toString()}`);
 
     const promptContent = `
 Zachowuj się jak doświadczony moderator treści, który rygorystycznie rozpoznaje czy dana treść powinna być moderowana czy nie. Twoje odpowiedzi powinny zawierać tylko i wyłącznie tablicę sformatowaną zgodnie z instrukcjami w Kontekście.
@@ -51,6 +57,9 @@ ${JSON.stringify(moderationTaskData)}
     };
     const moderationTaskAiChatResult =
       await aiChatApi.sendModerationTaskMessage(prompt);
+    logger.info(
+      `Moderation task chat result: ${moderationTaskAiChatResult.toString()}`
+    );
 
     const taskAnswer = await aiDevsTasksApi.sendAnswer(
       moderationTaskAiChatResult,
