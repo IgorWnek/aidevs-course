@@ -4,8 +4,8 @@ import { TaskResult } from './SolveTaskUseCase';
 
 describe('Given Moderation Task Use Case', () => {
   describe('When task is solved correctly', () => {
-    it('Then use-case returns truthy response', () => {
-      const taskResult = solveModerationTaskUseCase.execute();
+    it('Then use-case returns truthy response', async () => {
+      const taskResult = await solveModerationTaskUseCase.execute();
       const expectedTaskResult: TaskResult = {
         answeredCorrect: true,
       };

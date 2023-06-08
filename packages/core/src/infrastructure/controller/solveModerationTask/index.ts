@@ -1,12 +1,8 @@
 import { SolveModerationTaskController } from './SolveModerationTaskController';
-import { aiDevsTasksApi } from '../../api/tasks';
-import { openAiChatApi } from '../../api/aiChat';
-import { winstonLogger } from '../../log';
+import { solveModerationTaskUseCase } from '../../../application/useCase/solveModerationTask';
 
 const solveModerationTaskController = new SolveModerationTaskController({
-  tasksApi: aiDevsTasksApi,
-  aiChatApi: openAiChatApi,
-  logger: winstonLogger,
+  solveModerationTaskUseCase: solveModerationTaskUseCase,
 });
 
 export { solveModerationTaskController };
