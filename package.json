@@ -11,7 +11,8 @@
     "console": "AWS_PROFILE=aidevs-course sst console",
     "typecheck": "tsc --noEmit",
     "lint": "npx eslint .",
-    "lint-fix": "npx eslint --fix ."
+    "lint-fix": "npx eslint --fix .",
+    "test": "sst bind vitest run"
   },
   "devDependencies": {
     "@tsconfig/node16": "^1.0.4",
