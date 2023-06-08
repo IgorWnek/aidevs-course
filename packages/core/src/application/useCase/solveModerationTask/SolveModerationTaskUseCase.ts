@@ -1,7 +1,11 @@
-export interface TaskResult {
-  answeredCorrect: boolean;
-}
+import { SolveTaskUseCase, TaskResult } from './SolveTaskUseCase';
 
-export interface SolveModerationTaskUseCase {
-  execute(): Promise<TaskResult>;
+export class SolveModerationTaskUseCase implements SolveTaskUseCase {
+  async execute(): Promise<TaskResult> {
+    const taskResult: TaskResult = {
+      answeredCorrect: false,
+    };
+
+    return Promise.resolve(taskResult);
+  }
 }

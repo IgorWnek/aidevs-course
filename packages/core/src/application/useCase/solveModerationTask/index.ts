@@ -1,6 +1,5 @@
-import { SolveModerationTaskUseCaseImplementation } from "./SolveModerationTaskUseCaseImplementation";
+import { SolveModerationTaskUseCase } from './SolveModerationTaskUseCase';
 
-const solveModerationTaskUseCase =
-  new SolveModerationTaskUseCaseImplementation();
+const solveModerationTaskUseCase = new SolveModerationTaskUseCase();
 
 export { solveModerationTaskUseCase };
