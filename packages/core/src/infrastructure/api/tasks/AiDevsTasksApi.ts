@@ -1,6 +1,6 @@
 import { AiDevsConfig } from '../../../../config/aiDevs/AiDevsConfig';
 import fetch, { RequestInit } from 'node-fetch';
-import { TaskAnswer, TasksApi, TaskToken } from './TasksApi';
+import { TaskAnswer, TaskResponse, TasksApi, TaskToken } from './TasksApi';
 
 export interface AiDevsTasksApiDependencies {
   aiDevsConfig: AiDevsConfig;
@@ -10,11 +10,6 @@ interface AiDevsTaskTokenResponse {
   code: number;
   msg: string;
   token: string;
-}
-interface TaskResponse<TaskResponseData> {
-  code: number;
-  msg: string;
-  input: TaskResponseData;
 }
 
 export class AiDevsTasksApi implements TasksApi {
@@ -46,7 +41,9 @@ export class AiDevsTasksApi implements TasksApi {
     };
   }
 
-  async getTaskData<TaskData>(taskToken: TaskToken): Promise<TaskData> {
+  async getTaskData<TaskData>(
+    taskToken: TaskToken
+  ): Promise<TaskResponse<TaskData>> {
     const taskPath = '/task';
     const taskEndpointUrl = `${this.tasksUrl}${taskPath}/${taskToken.value}`;
     const requestOptions: RequestInit = {
@@ -57,9 +54,8 @@ export class AiDevsTasksApi implements TasksApi {
     };
 
     const taskResponse = await fetch(taskEndpointUrl, requestOptions);
-    const task = (await taskResponse.json()) as TaskResponse<TaskData>;
 
-    return task.input;
+    return (await taskResponse.json()) as TaskResponse<TaskData>;
   }
 
   async sendAnswer<AnswerData>(

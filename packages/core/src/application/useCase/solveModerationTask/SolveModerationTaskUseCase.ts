@@ -31,7 +31,9 @@ export class SolveModerationTaskUseCase implements SolveTaskUseCase {
     const moderationTaskData = await tasksApi.getTaskData<ModerationTaskData>(
       taskToken
     );
-    logger.info(`Moderation task data:\n${moderationTaskData.toString()}`);
+    logger.info(
+      `Moderation task data:\n${moderationTaskData.input.toString()}`
+    );
 
     const promptContent = `
 Zachowuj się jak doświadczony moderator treści, który rygorystycznie rozpoznaje czy dana treść powinna być moderowana czy nie. Twoje odpowiedzi powinny zawierać tylko i wyłącznie tablicę sformatowaną zgodnie z instrukcjami w Kontekście.
@@ -49,7 +51,7 @@ Przykładowa odpowiedź:
 [0,0,1,0]
 
 ### Zadanie
-${JSON.stringify(moderationTaskData)}
+${JSON.stringify(moderationTaskData.input)}
   `;
 
     const prompt: Prompt = {
