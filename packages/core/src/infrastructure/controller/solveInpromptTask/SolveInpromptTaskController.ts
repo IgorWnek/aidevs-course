@@ -1,11 +1,12 @@
 import { Logger } from '../../log/Logger';
+import { SolveTaskUseCase } from '../../../application/useCase/SolveTaskUseCase';
 
 export interface SolveInpromptTaskControllerDependencies {
-  solveInpromptTaskUseCase: string;
+  solveInpromptTaskUseCase: SolveTaskUseCase;
   logger: Logger;
 }
 
-export interface SolveInpromptTaskResponse {
+export interface SolveInpromptTaskResult {
   content: 'Correct!' | 'Incorrect...';
 }
 
@@ -14,12 +15,20 @@ export class SolveInpromptTaskController {
     private dependencies: SolveInpromptTaskControllerDependencies
   ) {}
 
-  public async solveInpromptTask(): Promise<SolveInpromptTaskResponse> {
-    const { logger } = this.dependencies;
+  public async solveInpromptTask(): Promise<SolveInpromptTaskResult> {
+    const { solveInpromptTaskUseCase, logger } = this.dependencies;
     logger.info(`Solving "inprompt" task`);
 
-    return {
+    const taskResult = await solveInpromptTaskUseCase.execute();
+
+    const result: SolveInpromptTaskResult = {
       content: 'Incorrect...',
     };
+
+    if (taskResult.answeredCorrect) {
+      result.content = 'Correct!';
+    }
+
+    return result;
   }
 }
