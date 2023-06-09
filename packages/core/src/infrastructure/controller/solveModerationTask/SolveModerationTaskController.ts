@@ -1,4 +1,4 @@
-import { SolveTaskUseCase } from '../../../application/useCase/solveModerationTask/SolveTaskUseCase';
+import { SolveTaskUseCase } from '../../../application/useCase/SolveTaskUseCase';
 
 export interface SolveModerationTaskDependencies {
   solveModerationTaskUseCase: SolveTaskUseCase;

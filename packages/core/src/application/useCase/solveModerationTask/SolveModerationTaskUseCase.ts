@@ -1,4 +1,4 @@
-import { SolveTaskUseCase, TaskResult } from './SolveTaskUseCase';
+import { SolveTaskUseCase, TaskResult } from '../SolveTaskUseCase';
 import { TasksApi } from '../../../infrastructure/api/tasks/TasksApi';
 import {
   AiChatApi,

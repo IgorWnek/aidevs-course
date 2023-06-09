@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { solveModerationTaskUseCase } from './index';
-import { TaskResult } from './SolveTaskUseCase';
+import { TaskResult } from '../SolveTaskUseCase';
 
 describe('Given Moderation Task Use Case', () => {
   describe('When task is solved correctly', () => {
