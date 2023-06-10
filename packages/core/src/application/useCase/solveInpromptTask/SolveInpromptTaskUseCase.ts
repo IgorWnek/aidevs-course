@@ -54,6 +54,15 @@ export class SolveInpromptTaskUseCase implements SolveTaskUseCase {
     const sentence = sentencesAboutCharacter[0];
     logger.info(`Sentence about character: ${sentence}`);
 
+    const promptAboutQuestion: Prompt = {
+      content: this.getPromptToAnswerQuestion(sentence, taskData.question),
+    };
+    logger.info(`Prompt about question: ${promptAboutQuestion.content}`);
+    const aiAnswer = await aiChatApi.getSingleChatResponse<string>(
+      promptAboutQuestion
+    );
+    logger.info(`Ai answer: ${aiAnswer}`);
+
     return {
       answeredCorrect: false,
     };
@@ -66,6 +75,24 @@ Zachowuj się jak analizator tekstów i filolog.
 Analizuję pewne pytania, z których potrzebuję uzyskać jedynie imię postaci, której dotyczy to pytanie. W odpowiedzi, zwróć tylko i wyłącznie imię osoby, której to pytanie dotyczy.
 
 ### Pytanie do analizy
+${question}
+    `;
+  }
+
+  private getPromptToAnswerQuestion(
+    sentence: string,
+    question: string
+  ): string {
+    return `
+Zachowuj się jak analizator tekstów i filolog.
+
+Analizuję konkretne zdanie, do którego mam pytanie dotyczące osoby o danym imieniu.
+Chcę, żebyś odpowiedział bardzo dokładnie i jednym słowem na dane pytanie.
+
+### Zdanie do analizy
+${sentence}
+
+### Pytanie
 ${question}
     `;
   }
