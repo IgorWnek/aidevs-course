@@ -6,6 +6,7 @@ import {
 } from '../../../infrastructure/api/aiChat/AiChatApi';
 import { Logger } from '../../../infrastructure/log/Logger';
 import { TextSearchService } from '../../../domain/textSearch/TextSearchService';
+import { aiDevsTasksApi } from '../../../infrastructure/api/tasks';
 
 export interface SolveInpromptTaskUseCaseDependencies {
   tasksApi: TasksApi;
@@ -63,8 +64,10 @@ export class SolveInpromptTaskUseCase implements SolveTaskUseCase {
     );
     logger.info(`Ai answer: ${aiAnswer}`);
 
+    const taskAnswer = await aiDevsTasksApi.sendAnswer(aiAnswer, taskToken);
+
     return {
-      answeredCorrect: false,
+      answeredCorrect: taskAnswer.isCorrect,
     };
   }
 
