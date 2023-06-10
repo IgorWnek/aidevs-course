@@ -18,7 +18,32 @@ export class OpenAiChatApi implements AiChatApi {
     });
   }
 
-  async sendModerationTaskMessage(prompt: Prompt): Promise<number[]> {
+  public async sendModerationTaskMessage(prompt: Prompt): Promise<number[]> {
+    const chatResponseContent = await this.getChatResponseContent(prompt);
+    let moderationPhrases = [] as number[];
+
+    if (chatResponseContent !== undefined) {
+      moderationPhrases = JSON.parse(chatResponseContent) as number[];
+    }
+
+    return moderationPhrases;
+  }
+
+  public async getSingleChatResponse<ResponseType>(
+    prompt: Prompt
+  ): Promise<ResponseType> {
+    const chatResponseContent = await this.getChatResponseContent(prompt);
+
+    if (chatResponseContent === undefined) {
+      throw new Error('OpenAi chat response is undefined');
+    }
+
+    return chatResponseContent as ResponseType;
+  }
+
+  private async getChatResponseContent(
+    prompt: Prompt
+  ): Promise<string | undefined> {
     const message: ChatCompletionRequestMessage = {
       role: 'user',
       content: prompt.content,
@@ -30,14 +55,6 @@ export class OpenAiChatApi implements AiChatApi {
       model: this.gptModel,
     });
 
-    const chatResponseContent =
-      completionResponse.data.choices[0].message?.content;
-    let moderationPhrases = [] as number[];
-
-    if (chatResponseContent !== undefined) {
-      moderationPhrases = JSON.parse(chatResponseContent) as number[];
-    }
-
-    return moderationPhrases;
+    return completionResponse.data.choices[0].message?.content;
   }
 }

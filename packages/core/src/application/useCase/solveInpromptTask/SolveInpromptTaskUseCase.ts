@@ -1,6 +1,9 @@
 import { SolveTaskUseCase, TaskResult } from '../SolveTaskUseCase';
 import { TasksApi } from '../../../infrastructure/api/tasks/TasksApi';
-import { AiChatApi } from '../../../infrastructure/api/aiChat/AiChatApi';
+import {
+  AiChatApi,
+  Prompt,
+} from '../../../infrastructure/api/aiChat/AiChatApi';
 import { Logger } from '../../../infrastructure/log/Logger';
 
 export interface SolveInpromptTaskUseCaseDependencies {
@@ -23,8 +26,32 @@ export class SolveInpromptTaskUseCase implements SolveTaskUseCase {
     const taskData = await tasksApi.getTaskData<unknown>(taskToken);
     logger.info(`Task data: ${JSON.stringify(taskData)}`);
 
+    if (!taskData.question) {
+      throw new Error('Inprompt task data must have a question.');
+    }
+
+    const promptAboutName: Prompt = {
+      content: this.getPromptAboutName(taskData.question),
+    };
+    logger.info(promptAboutName.content);
+    const characterName = await aiChatApi.getSingleChatResponse<string>(
+      promptAboutName
+    );
+    logger.info(characterName);
+
     return {
       answeredCorrect: false,
     };
+  }
+
+  private getPromptAboutName(question: string): string {
+    return `
+Zachowuj się jak analizator tekstów i filolog.
+
+Analizuję pewne pytania, z których potrzebuję uzyskać jedynie imię postaci, której dotyczy to pytanie. W odpowiedzi, zwróć tylko i wyłącznie imię osoby, której to pytanie dotyczy.
+
+### Pytanie do analizy
+${question}
+    `;
   }
 }
