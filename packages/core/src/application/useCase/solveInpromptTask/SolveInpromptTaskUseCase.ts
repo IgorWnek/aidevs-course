@@ -5,10 +5,12 @@ import {
   Prompt,
 } from '../../../infrastructure/api/aiChat/AiChatApi';
 import { Logger } from '../../../infrastructure/log/Logger';
+import { TextSearchService } from '../../../domain/textSearch/TextSearchService';
 
 export interface SolveInpromptTaskUseCaseDependencies {
   tasksApi: TasksApi;
   aiChatApi: AiChatApi;
+  textSearchService: TextSearchService;
   logger: Logger;
 }
 
@@ -17,13 +19,14 @@ export class SolveInpromptTaskUseCase implements SolveTaskUseCase {
     private dependencies: SolveInpromptTaskUseCaseDependencies
   ) {}
   public async execute(): Promise<TaskResult> {
-    const { tasksApi, aiChatApi, logger } = this.dependencies;
+    const { tasksApi, aiChatApi, textSearchService, logger } =
+      this.dependencies;
 
     const taskName = 'inprompt';
     const taskToken = await tasksApi.fetchTaskToken(taskName);
     logger.info('Gathered task token');
 
-    const taskData = await tasksApi.getTaskData<unknown>(taskToken);
+    const taskData = await tasksApi.getTaskData<string[]>(taskToken);
     logger.info(`Task data: ${JSON.stringify(taskData)}`);
 
     if (!taskData.question) {
@@ -38,6 +41,18 @@ export class SolveInpromptTaskUseCase implements SolveTaskUseCase {
       promptAboutName
     );
     logger.info(characterName);
+
+    const sentencesAboutCharacter = [
+      ...textSearchService.findWordInArray(taskData.input, characterName),
+    ];
+
+    if (sentencesAboutCharacter.length === 0) {
+      throw new Error('No sentences about character found');
+    }
+
+    // In this implementation I care only about first sentence
+    const sentence = sentencesAboutCharacter[0];
+    logger.info(`Sentence about character: ${sentence}`);
 
     return {
       answeredCorrect: false,
