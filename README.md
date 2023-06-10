@@ -15,6 +15,12 @@ If you want be able to run project locally as SST application you must configure
 Right now SST requires you have installed at least Node.js 16 and npm 7.
 [Here](https://docs.sst.dev/learn/create-a-new-project) is the docs page about creating new project with SST.
 
+Create `.env` file and adjust variables with your values:
+
+```bash
+cp .env.dist .env
+```
+
 Run command below in the project root directory:
 
 ```bash
